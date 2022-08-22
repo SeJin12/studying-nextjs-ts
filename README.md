@@ -1,39 +1,112 @@
-## 서버 포트 지정
-package.json - scripts - "start": "next start -p $PORT"
+# stack
+- next js
+- typescript
+
+- Redux (state, store, reducer, action)
+- React UI Tools [MUI](https://mui.com/)
+
+<br>
+
+<hr>
+
+### 사이트
+- [API Route 개념 정리 블로그](https://ppsu.tistory.com/67)
+- [News API](https://newsapi.org/s/south-korea-news-api)
+- [Fake Rest API](https://jsonplaceholder.typicode.com)
+- [Movies API](https://developers.themoviedb.org/3)
+
+### 영상
+- [nomadcoders nextJS](https://nomadcoders.co/nextjs-fundamentals/lectures/3434)
+- [NextJS 실습 강좌. SEO](https://www.youtube.com/watch?v=pdWQvfQBSGg&list=LL&index=2&t=1201s)
+
+<br>
+
+## 서버 실행(포트 지정)
+
+```json
+[package.json]
+"scrips": {
+ 	"start" : "next start -p $PORT" 
+}
+```
+
+
+```terminal
 PORT=8000 npm start
+```
+
+<hr/>
+
+### index.js 파일은 현재 폴더의 root를 의미
 
 
-## index.js 파일 현재 폴더이 root를 의미
+## 2번 렌더링나는 현상 (console.log  log 여러번)
+Strict 모드가 활성화. 개발 모드일 경우 구성 요소를 두 번 렌더링한다. <br>
 
-## API Route 정보 사이트: https://ppsu.tistory.com/67
-
-
-# 기존 프로젝트에 typescript 적용 (해당 프로젝트는 처음부터 ts로 생성한거라 안해도됨)
-1. touch tsconfig.json
-2. npm run dev
-3. npm install --save-dev @types/react @types/node
-4. npm run dev
-## tsx 파일에서  node_module을 못찾는 오류있음 
-tsconfig.json - exclude - node_modules 주석 처리함
-/////////////////////////////
-
-# 2번 렌더링나는 현상
-Strict 모드가 활성화. 개발 모드일 경우 구성 요소를 두 번 렌더링한다.
-next.config.js  reactStrictMode: true  -> false 로 변경하면  2번 렌더링하지 않는다.
+`reactStrictMode: false` 로 변경하면  2번 렌더링하지 않는다. <br>
 하지만 strict 모드는 안전하지 않은 수명 주기, 레거시 API 사용 및 기타 여러 기능을 식별하는 데 도움을 준다고 하니 비활성화할 필요는 없음
+```js
+[next.config.js]
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+}
 
-##  tsconfig.json "resolveJsonModule": false, 원래 true임.
+module.exports = nextConfig
 
-## element-ui 오류 나서 안함
-## NextUI 설치  https://nextui.org/docs/guide/getting-started
-## npm i @nextui-org/react   삭제함. 최신거라 그런지 안되는부분이있음
-## mui ,  styled-components 설치
+```
+
+<hr/>
+
+
+## UI Library (mui ,  styled-components 설치)
+```bash
 npm install @mui/material @emotion/react @emotion/styled
 npm install @mui/material @mui/styled-engine-sc styled-components
+```
 
+<hr/>
 
+## Pre-rendering (프리 렌더링)
+next.js에서는 각 page에 getServerSideProps, getStaticProps, getStaticPaths 를 사용해서 데이터를 가져올 수 있다.
 
-*
+1. `getServerSideProps (SSR)` <br>
+데이터가 계속 바뀌는 페이지인 경우 사용 <br>
+1-1. Return Values
+ - props, netFound, redirect  3가지의 리턴 값을 가짐
+ - notFound: boolean 값을 가짐.  `{ notFound : true }`가 리턴되면 해당 페이지는 404 응답과 함께 Page Not Fount 화면으로 이동
+ - redirect: 해당 페이지로 접속 시, 개발자가 지정한 경로로 페이지를 리다이렉트하기 위해 사용되는 값 <br> `{ redirect: { desctination: string, permanent:boolean }`의 형태로 사용되는데, 만약 리다이렉트 시, Status Code를 변경할 필요가 있는 경우 permanent 대신 statusCode 라는 키를 사용해야한다
+ 
+1-2. Parameter <br>
+getServerSideProps는 context라는 파라미터를 받는다.
+
+```
+context: {
+	params: 페이지가 Dynamic Route 를 사용한 경우 들어오는 데이터, pages/[id].tsx 라면 params 에는 id 값이 들어온다.
+	req: Request 정보 (참고 https://nodejs.org/api/http.html#http_class_http_incomingmessage)
+	res: Response 정보 (참고 https://nodejs.org/api/http.html#http_class_http_serverresponse)
+	query: 쿼리 스트링 데이터가 담겨있다.
+	preview: Preview 모드 사용 유무 (boolean)
+	previewData: Preview 모드 사용시 전달된 데이터
+	resolvedUrl: Request 된 URL 의 좀 더 일반화된 (간소화된?) 버전의 url
+	locale: 현재 locale 정보
+	locales: 지원되는 모든 locale 정보
+	defaultLocale: 기본 locale 정보
+}
+```
+
+[Data Fetching - getServerSideProps](https://woobiblog.com/Javascript/Nextjs_Data_Fetching_getServerSideProps)
+
+2. `getStaticProps, getStaticPaths (SSG)` <br>
+html이 빌드 타임에 생성된다. 빌드할때 데이터를 가져와서 html을 생성 후, 사용자의 요청이 들어올 때마다 빌드된 html을 사용 <br>
+아무래도 미리 html 파일을 만들어놓고 요청 시에 보여주기 때문에 성능적으로 빠르다. <br>
+하지만 데이터가 계속 바뀌어야하는 페이지에서는 SSR을 사용 <br>
+
+다이나믹 라우팅을 사용하여 정적 페이지를 만들 경우에는 getStaticPaths 와 함께 써줘야한다.
+
+```javascript
+/*
   SSR (Server Side Rendering)
   "page가 요청받을때마다" 호출되어 pre-rendering
   pre-render가 꼭 필요한 동적 데이터가 있는 page에 사용
@@ -60,7 +133,7 @@ export const getServerSideProps = async () => {
  장점은 호출 시마다 매번 data fetch 를 하지 않으니 getServerSideProps 보다 성능면에서 좋다
 */
 
-/* export const getStaticProps = async () => {
+export const getStaticProps = async () => {
   const res = await fetch(
     `https://jsonplaceholder.typicode.com/posts?_start=1&end=5`
   );
@@ -73,7 +146,7 @@ export const getServerSideProps = async () => {
     // At most once every 10 seconds
     revalidate: 10 // In seconds 
   };
-}; */
+};
 
 
 /* getStaticPaths
@@ -116,3 +189,8 @@ export const getStaticPaths = async () => {
     fallback: false,
   };
 };
+```
+
+
+# todo
+react component를 리턴하지않는 파일은 pages 경로 안에 둘 수 없다

@@ -2,7 +2,7 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "./components/frame/Layout";
 
-import wrapper from "./lib/store/configureStore";
+import wrapper from "../store/configureStore";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

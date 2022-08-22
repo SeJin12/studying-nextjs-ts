@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { testAction } from "./lib/store/modules/test";
+import { testAction } from "../store/modules/test";
 
-const test = () => {
+const Test = () => {
   const [text, setText] = useState("");
-  const onChange = (e) => {
-    setText(e.target.value);
+  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    setText(e.currentTarget.value);
   };
 
-  const name = useSelector((state) => state.test);
+  const name = useSelector((state: any) => state.test);
 
   useEffect(() => {
     console.log(name);
@@ -24,7 +24,7 @@ const test = () => {
       <input onChange={onChange} placeholder="input your message." />
       <button onClick={onDispatch}>Button</button>
       <ul>
-        {name.map((v, index) => (
+        {name.map((v: string, index: number) => (
           <li key={index}>{v}</li>
         ))}
       </ul>
@@ -32,4 +32,4 @@ const test = () => {
   );
 };
 
-export default test;
+export default Test;

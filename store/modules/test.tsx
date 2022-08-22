@@ -5,7 +5,7 @@ const TEST = "TEST";
 export const testAction = (text:string) => ({ type: TEST, text });
 
 // Initial State
-const initialState = [];
+const initialState:string[] = [];
 
 // Reducer
 const test = (state = initialState, action:any) => {

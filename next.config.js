@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
-const API_KEY = 'ABCD'; // 또는 환경변수 .env file
+
+const NEWS_API_KEY = process.env.NEWS_API_KEY;
 
 const nextConfig = {
   reactStrictMode: true,
@@ -16,8 +17,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/test/a',
-        destination: `/zyx/${API_KEY}`
+        source: '/moviesapi',
+        destination: `https://newsapi.org/v2/top-headlines?country=kr&apiKey=bf9d4ea494024b88a8840dc1886dcbc5`
       }
     ]
   }
