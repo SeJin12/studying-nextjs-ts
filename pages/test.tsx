@@ -1,55 +1,32 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { testAction } from "../store/modules/test";
+import React from "react";
 
-
-import {defaultPost} from '../lib/Axios/Common';
-
-
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+ 
 const Test = () => {
-  const [text, setText] = useState("");
-  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setText(e.currentTarget.value);
+  const [name, setName] = React.useState('Composed TextField');
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
   };
 
-  const name = useSelector((state: any) => state.test);
-
-  useEffect(() => {
-    const ret = defaultPost('/api/hello', undefined).then(res => {
-      console.log('POST response', res);
-    });
-    
-    // (async () => {
-    //   const ret = await 
-    //   const results = await (
-    //     await fetch(
-    //       `/api/hello`
-    //     )
-    //   ).json();
-    //   console.log(results);
-    // })();
-
-    // console.log(name);
-  }, [name]);
-
- 
-
-  const dispatch = useDispatch();
-  const onDispatch = () => dispatch(testAction(text));
-
   return (
-    <div>
-      {text}
-      <br />
-      <input onChange={onChange} placeholder="input your message." />
-      <button onClick={onDispatch}>Button</button>
-      <ul>
-        {name.map((v: string, index: number) => (
-          <li key={index}>{v}</li>
-        ))}
-      </ul>
-    </div>
+    <Box
+      component="form"
+      sx={{
+        '& > :not(style)': { m: 1 },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+      <FormControl variant="standard">
+        <InputLabel htmlFor="component-simple">Name</InputLabel>
+        <Input id="component-simple" value={name} onChange={handleChange} />
+      </FormControl>
+    </Box>
   );
-};
+}
 
 export default Test;

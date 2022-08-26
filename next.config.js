@@ -19,6 +19,9 @@ const nextConfig = {
       {
         source: '/moviesapi',
         destination: `https://newsapi.org/v2/top-headlines?country=kr&apiKey=bf9d4ea494024b88a8840dc1886dcbc5`
+      }, {
+        source: '/upbit/:path*',
+        destination: `http://192.168.0.11:8080/:path*`
       }
     ]
   }

@@ -3,8 +3,8 @@ import HeaderInfo from "./HeaderInfo";
 import Nav from "./Nav";
 
 export type Props = {
-  children: JSX.Element
-}
+  children: JSX.Element;
+};
 
 const Layout = (props: Props) => {
   return (

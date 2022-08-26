@@ -18,7 +18,7 @@ const HeaderInfo = (props: Header) => {
 };
 
 HeaderInfo.defaultProps = {
-  title: "Project ts",
+  title: "NextJS SYSTEM",
   keyword: "meta keyword",
   contents: "meta contents",
 };

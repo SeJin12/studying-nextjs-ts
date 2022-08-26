@@ -4,6 +4,8 @@ import Layout from "./components/frame/Layout";
 
 import wrapper from "../store/configureStore";
 
+
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
       <Layout>
