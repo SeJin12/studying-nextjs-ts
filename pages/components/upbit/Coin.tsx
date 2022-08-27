@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-// import { defaultGet } from "/lib/Axios/Common";
-import { defaultGet } from "../../../lib/Axios/Common";
-
-import { Market } from "../../../types/MarketInfo";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { defaultGet, fetcher } from "@lib/Axios/Common";
+// import { defaultGet } from "../../../lib/Axios/Common";
+import { Market } from "@types/MarketInfo";
 import { GetStaticProps } from "next";
 
 import Box from "@mui/material/Box";
@@ -10,25 +9,55 @@ import FormControl from "@mui/material/FormControl";
 import Input from "@mui/material/Input";
 import InputLabel from "@mui/material/InputLabel";
 import {
+  Button,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 import HeaderInfo from "../frame/HeaderInfo";
+import useSWR from "swr";
 
-const Coin: React.FC<Market> = ({ results }) => {
+function countFilter(
+  originData: Market[],
+  market: string,
+  koreanName: string,
+  englishName: string,
+  marketWarning: string
+) {
+  return originData.filter(
+    (data: Market) =>
+      data.market !== "" &&
+      data.market.includes(market.toUpperCase()) &&
+      data.korean_name !== "" &&
+      data.korean_name.includes(koreanName) &&
+      data.english_name !== "" &&
+      data.english_name.toUpperCase().includes(englishName.toUpperCase()) &&
+      data.market_warning !== "" &&
+      data.market_warning.includes(marketWarning.toUpperCase())
+  ).length;
+}
+
+const Coin = ({ results }) => {
+
   const [market, setMarket] = useState<string>("");
   const [koreanName, setKoreanName] = useState<string>("");
   const [englishName, setEnglishName] = useState<string>("");
   const [marketWarning, setMarketWarning] = useState<string>("");
-
   const [searchData, setSearchData] = useState<Market[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const originData: Market[] = results;
+  const filterCount = useRef(results.length);
+
+  const count = useMemo(
+    () =>
+      countFilter(originData, market, koreanName, englishName, marketWarning),
+    [originData, market, koreanName, englishName, marketWarning]
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === "market") {
@@ -51,8 +80,9 @@ const Coin: React.FC<Market> = ({ results }) => {
     "현재가",
   ];
 
-  useEffect(() => {
-    setSearchData((_searchData) =>
+  const onSearch = () => {
+    setLoading(true);
+    setSearchData(
       originData.filter(
         (data: Market) =>
           data.market !== "" &&
@@ -65,7 +95,34 @@ const Coin: React.FC<Market> = ({ results }) => {
           data.market_warning.includes(marketWarning.toUpperCase())
       )
     );
-  }, [originData, market, koreanName, englishName, marketWarning]);
+    filterCount.current = count;
+    setLoading(false);
+  };
+
+  const onInit = () => {
+    setLoading(true);
+    setMarket("");
+    setKoreanName("");
+    setEnglishName("");
+    setMarketWarning("");
+    filterCount.current = originData.length;
+    setSearchData(originData);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!searchData) {
+      setSearchData(originData);
+      filterCount.current = count;
+    }
+    
+  }, [originData, searchData]);
+
+  const handleOnKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter") {
+      onSearch();
+    }
+  };
 
   return (
     <div>
@@ -79,10 +136,6 @@ const Coin: React.FC<Market> = ({ results }) => {
         noValidate
         autoComplete="off"
       >
-        <Typography variant="h5">
-          검색 조건.{" "}
-          {searchData && `(${searchData.length} / ${originData.length})`}
-        </Typography>
         <FormControl variant="outlined">
           <InputLabel htmlFor="component-simple">코드</InputLabel>
           <Input
@@ -90,6 +143,7 @@ const Coin: React.FC<Market> = ({ results }) => {
             name="market"
             value={market}
             onChange={handleChange}
+            onKeyDown={handleOnKeyDown}
           />
         </FormControl>
         <FormControl variant="outlined">
@@ -99,6 +153,7 @@ const Coin: React.FC<Market> = ({ results }) => {
             name="korean_name"
             value={koreanName}
             onChange={handleChange}
+            onKeyDown={handleOnKeyDown}
           />
         </FormControl>
         <FormControl variant="outlined">
@@ -108,6 +163,7 @@ const Coin: React.FC<Market> = ({ results }) => {
             name="english_name"
             value={englishName}
             onChange={handleChange}
+            onKeyDown={handleOnKeyDown}
           />
         </FormControl>
         <FormControl variant="outlined">
@@ -117,40 +173,50 @@ const Coin: React.FC<Market> = ({ results }) => {
             name="market_warning"
             value={marketWarning}
             onChange={handleChange}
+            onKeyDown={handleOnKeyDown}
           />
         </FormControl>
+        <Button variant="text" onClick={onSearch}>
+          검색
+        </Button>
+        <Button variant="text" onClick={onInit}>
+          초기화
+        </Button>
       </Box>
-
-      <TableContainer sx={{ marginTop: "15px" }}>
-        <Table
-          sx={{ minWidth: 650, border: "1px solid grey" }}
-          aria-label="table"
-        >
-          <TableHead>
-            <TableRow>
-              {columns.map((column: string, index: number) => (
-                <TableCell key={index}>{column}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!searchData && <p>Loading...</p>}
-            {searchData &&
-              searchData.map((data: Market, index: number) => (
-                <TableRow
-                  key={index}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{data.market}</TableCell>
-                  <TableCell>{data.korean_name}</TableCell>
-                  <TableCell>{data.english_name}</TableCell>
-                  <TableCell>{data.market_warning}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <p>검색 결과: {searchData && `${filterCount.current} / ${originData.length}`}</p>
+      {loading && <CircularProgress />}
+      {!loading && (
+        <TableContainer sx={{ marginTop: "15px" }}>
+          <Table
+            sx={{ minWidth: 650, border: "1px solid grey" }}
+            aria-label="table"
+          >
+            <TableHead>
+              <TableRow>
+                {columns.map((column: string, index: number) => (
+                  <TableCell key={index}>{column}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {!searchData && <p>Loading...</p>}
+              {searchData &&
+                searchData.map((data: Market, index: number) => (
+                  <TableRow
+                    key={index}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{data.market}</TableCell>
+                    <TableCell>{data.korean_name}</TableCell>
+                    <TableCell>{data.english_name}</TableCell>
+                    <TableCell>{data.market_warning}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <style jsx>
         {`

@@ -5,7 +5,6 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -14,11 +13,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Link from "next/link";
 
 const pages = [
-  { href: "/", text: "Home" },
-  { href: "/Test", text: "Test" },
-  { href: "/containers/CounterContainer", text: "Counter" },
-  { href: "/components/upbit/Coin", text: "Coin" },
-  { href: "/components/upbit/Wallet", text: "Wallet" },
+  { href: "/", text: "대시보드" },
+  { href: "/Test", text: "테스트" },
+  { href: "/containers/CounterContainer", text: "카운터" },
+  { href: "/components/upbit/Coin", text: "코인 목록" },
+  { href: "/components/upbit/Wallet", text: "지갑" },
 ];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -46,95 +45,20 @@ const Nav = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" style={{ background: "#D9E5FF", color: "black" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            SYSTEM
-          </Typography>
-
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
-              // <Button
-              //   key={page.text}
-              //   onClick={handleCloseNavMenu}
-              //   sx={{ my: 2, color: "white", display: "block" }}
-              // >
-              //   <Link href={page.href}>
-              //     <a>{page.text}</a>
-              //   </Link>
-              // </Button>
               <Link href={page.href} key={page.text}>
                 <Button
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block" }}
+                  sx={{ my: 2, color: "black", display: "block" }}
                 >
                   {page.text}
                 </Button>
               </Link>
             ))}
-          </Box>
-
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="favicon" src="/favicon.ico" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
           </Box>
         </Toolbar>
       </Container>

@@ -13,9 +13,11 @@ export const customAxios: AxiosInstance = axios.create({
 });
 
 export const defaultGet = async (api: string, parameters: any) => {
-    return await axios.get(api, parameters);
-  };
+  return await axios.get(api, parameters);
+};
 
 export const defaultPost = async (api: string, parameters: any) => {
   return await axios.post(api, parameters);
 };
+
+export const fetcher = (url: string) => axios.get(url).then((res) => res.data);

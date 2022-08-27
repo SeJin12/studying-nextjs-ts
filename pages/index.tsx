@@ -1,42 +1,44 @@
 import type { GetServerSideProps, NextPage } from "next";
 import { useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
+import { defaultGet } from "@lib/Axios/Common";
 
-type Movie = {
-  adult: boolean;
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-};
+import { Movie } from '../types/Movie';
 
 // getServerSideProps 에서 return 값을 받아 사용
 const Home: NextPage = () => {
-  // const [movies, setMovies] = useState<Movie[] | undefined>(undefined);
+  const [data, setData] = useState(null);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const { results } = await (
-  //       await fetch(
-  //         `https://api.themoviedb.org/3/movie/popular?api_key=50b189ad76cde27970ce35179200ec5d`
-  //       )
-  //     ).json();
-  //     setMovies(results);
-  //   })();
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      const results = await defaultGet("/api/price", { a: "a" });
+      // console.log(results);
+      setData(results.data);
+    })();
+  }, []);
+
+  if (data) {
+    console.log(data);
+  }
+
+  const [movies, setMovies] = useState<Movie[] | undefined>(undefined);
+
+  useEffect(() => {
+    (async () => {
+      const { results } = await (
+        await fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=50b189ad76cde27970ce35179200ec5d`
+        )
+      ).json();
+      setMovies(results);
+    })();
+  }, []);
 
   return (
     <div className={styles.container}>
       <h1>Next JS</h1>
       <ul>
-        {/* {movies &&
+        {movies &&
           movies.map((movie) => (
             <li key={movie.id}>
               <div>
@@ -44,7 +46,7 @@ const Home: NextPage = () => {
               </div>
               release: <span>{movie.release_date}</span>
             </li>
-          ))} */}
+          ))}
       </ul>
       <style jsx>
         {`

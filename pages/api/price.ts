@@ -2,7 +2,7 @@
 import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { useState } from "react";
-import { defaultGet } from "../../lib/Axios/Common";
+import { defaultGet } from "@lib/Axios/Common";
 
 export default function handler(
   req: NextApiRequest,

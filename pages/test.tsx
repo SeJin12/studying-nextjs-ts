@@ -1,32 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import useSWR from "swr";
 
-import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import Input from '@mui/material/Input';
-import InputLabel from '@mui/material/InputLabel';
- 
+import { fetcher } from "@lib/Axios/Common";
+
 const Test = () => {
-  const [name, setName] = React.useState('Composed TextField');
+  const { data, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_UPBIT_API}/v1/market/all`,
+    fetcher
+  );
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
+  // const { data, error } = useSWR(
+  //   `${process.env.NEXT_PUBLIC_UPBIT_API}/v1/market/all`,
+  //   fetcher
+  // );
+
+  const [coins, setCoins] = useState([]);
+
+  const onCheck = () => {
+    console.log(data);
   };
 
+  if (!coins) {
+    setCoins(data);
+  }
+
+  useEffect(() => {
+    setCoins(data);
+  }, [coins, data]);
+
+  if (error)
+    return (
+      <div>
+        <button onClick={onCheck}>check</button>
+        failed to load
+      </div>
+    );
+  if (!data || data === null)
+    return (
+      <div>
+        <button onClick={onCheck}>check</button>loading...
+      </div>
+    );
+
   return (
-    <Box
-      component="form"
-      sx={{
-        '& > :not(style)': { m: 1 },
-      }}
-      noValidate
-      autoComplete="off"
-    >
-      <FormControl variant="standard">
-        <InputLabel htmlFor="component-simple">Name</InputLabel>
-        <Input id="component-simple" value={name} onChange={handleChange} />
-      </FormControl>
-    </Box>
+    <div>
+      <button onClick={onCheck}>check</button>
+      <ul>
+        {coins && coins.map((c: any, i: number) => <li key={i}>{c.market}</li>)}
+      </ul>
+    </div>
   );
-}
+};
 
 export default Test;
